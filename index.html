@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROSEI Foundation Alignment Tool</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#f5f6f8;color:#111}
+.topbar{background:#002D72;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo-area{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:#FF6900;border-radius:5px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;flex-shrink:0}
+.logo-text{color:white;font-size:13px;font-weight:500;line-height:1.3}
+.logo-text small{display:block;color:rgba(168,200,240,0.7);font-size:10px;font-weight:400}
+.nav-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.nav-tab{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;color:rgba(168,200,240,0.85);border:none;background:transparent;transition:all 0.15s}
+.nav-tab:hover{background:rgba(255,255,255,0.1);color:white}
+.nav-tab.active{background:rgba(255,255,255,0.18);color:white}
+.status{font-size:11px;color:rgba(168,200,240,0.7);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.dot-live{width:7px;height:7px;background:#4ade80;border-radius:50%}
+.stats-bar{background:white;border-bottom:1px solid #e2e5ea;padding:10px 20px;display:flex;gap:0;align-items:center;overflow-x:auto}
+.stat{text-align:center;padding:0 20px;flex-shrink:0}
+.stat-n{font-size:22px;font-weight:700;color:#002D72;line-height:1}
+.stat-n.orange{color:#FF6900}
+.stat-n.gray{color:#9ca3af}
+.stat-l{font-size:10px;color:#6b7280;margin-top:2px}
+.divider{width:1px;height:36px;background:#e2e5ea;flex-shrink:0}
+.stat-note{margin-left:auto;font-size:11px;color:#9ca3af;padding-left:20px;white-space:nowrap}
+.view{display:none}
+.view.active{display:flex;flex-direction:column}
+.two-col{display:grid;grid-template-columns:300px 1fr;height:calc(100vh - 113px)}
+.left-panel{background:white;border-right:1px solid #e2e5ea;overflow-y:auto;display:flex;flex-direction:column}
+.panel-header{padding:14px 16px 10px;border-bottom:1px solid #e2e5ea;position:sticky;top:0;background:white;z-index:2}
+.panel-label{font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.search-input{width:100%;padding:8px 11px;border:1px solid #e2e5ea;border-radius:7px;font-size:13px;outline:none;color:#111}
+.search-input:focus{border-color:#002D72}
+.filter-row{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
+.chip{padding:3px 9px;border-radius:12px;font-size:11px;cursor:pointer;border:1px solid #e2e5ea;background:white;color:#6b7280;font-weight:500;transition:all .12s}
+.chip:hover{border-color:#002D72;color:#002D72}
+.chip.on{background:#002D72;color:white;border-color:#002D72}
+.r-list{overflow-y:auto;flex:1}
+.r-item{padding:10px 16px;cursor:pointer;border-bottom:1px solid #f3f4f6;transition:background .1s}
+.r-item:hover{background:#f8f9ff}
+.r-item.sel{background:#EBF0FB;border-left:3px solid #002D72;padding-left:13px}
+.r-name{font-size:13px;font-weight:600;color:#111;margin-bottom:3px}
+.r-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px}
+.b-Core{background:#dbeafe;color:#1e40af}
+.b-Associate{background:#d1fae5;color:#065f46}
+.b-Affiliate{background:#fef3c7;color:#92400e}
+.b-toc{background:#f3f4f6;color:#374151;font-weight:400}
+.right-panel{overflow-y:auto;background:#f5f6f8}
+.empty-state{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#d1d5db}
+.empty-state svg{width:40px;height:40px;margin-bottom:4px}
+.empty-state p{font-size:13px;color:#9ca3af}
+.detail{padding:20px 24px}
+.gap-banner{background:#fff7ed;border:1px dashed #fed7aa;border-radius:8px;padding:11px 14px;margin-bottom:16px}
+.gap-title{font-size:12px;font-weight:600;color:#c2410c;margin-bottom:3px}
+.gap-body{font-size:11px;color:#92400e;line-height:1.7;padding-left:14px}
+.hero-card{background:white;border:1px solid #e2e5ea;border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.hero-top{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.avatar{width:48px;height:48px;border-radius:8px;background:#002D72;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:16px;flex-shrink:0}
+.hero-name{font-size:17px;font-weight:700;color:#111;margin-bottom:2px}
+.hero-sub{font-size:11px;color:#6b7280;line-height:1.5}
+.lc-badge{font-size:10px;background:#002D72;color:white;padding:2px 7px;border-radius:10px;vertical-align:middle;margin-left:5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-label{font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.field-val{font-size:12px;color:#374151;line-height:1.5}
+.pill-row{display:flex;flex-wrap:wrap;gap:4px}
+.p-pill{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
+.pCarbon{background:#d1fae5;color:#065f46}
+.pStorage{background:#dbeafe;color:#1e40af}
+.pWind{background:#ede9fe;color:#5b21b6}
+.pGrid{background:#fef3c7;color:#92400e}
+.pNuclear{background:#fee2e2;color:#991b1b}
+.pSolar{background:#fff7ed;color:#c2410c}
+.p-def{background:#f3f4f6;color:#374151}
+.policy-text{font-size:12px;color:#374151;line-height:1.6;grid-column:1/-1}
+.needs{background:#fef3c7;color:#b45309;font-size:10px;padding:1px 6px;border-radius:8px}
+.ready{color:#059669;font-weight:600;font-size:12px}
+.section-head{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin:4px 0 10px}
+.f-cards{display:flex;flex-direction:column;gap:8px}
+.f-card{background:white;border:1px solid #e2e5ea;border-radius:8px;padding:13px 15px}
+.f-card.top{border-left:3px solid #FF6900}
+.f-top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.f-name{font-size:13px;font-weight:600;color:#111}
+.f-sub{font-size:10px;color:#9ca3af;margin-top:1px}
+.score-wrap{display:flex;align-items:center;gap:6px;min-width:80px}
+.score-bar{height:4px;border-radius:2px;background:#e2e5ea;flex:1}
+.score-fill{height:100%;border-radius:2px;background:#002D72}
+.score-num{font-size:11px;font-weight:700;color:#002D72;min-width:28px;text-align:right}
+.f-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.tag-toc{background:#ede9fe;color:#5b21b6;font-size:10px;padding:1px 6px;border-radius:8px}
+.tag-pillar{background:#d1fae5;color:#065f46;font-size:10px;padding:1px 6px;border-radius:8px}
+.tag-need{background:#fef3c7;color:#b45309;font-size:10px;padding:1px 6px;border-radius:8px}
+.f-why{font-size:11px;color:#6b7280;line-height:1.55}
+.star{color:#FF6900;margin-right:3px}
+/* Foundation panel */
+.f-list-item{padding:12px 16px;cursor:pointer;border-bottom:1px solid #f3f4f6;transition:background .1s}
+.f-list-item:hover{background:#f8f9ff}
+.f-list-item.sel{background:#EBF0FB;border-left:3px solid #FF6900;padding-left:13px}
+.f-item-name{font-size:13px;font-weight:600;color:#111;margin-bottom:3px}
+.f-item-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.tier1{background:#FF6900;color:white}
+.tier2{background:#fef3c7;color:#92400e}
+.tier3{background:#f3f4f6;color:#6b7280}
+/* Researcher match cards in FR view */
+.pr-cards{display:flex;flex-direction:column;gap:8px}
+.pr-card{background:white;border:1px solid #e2e5ea;border-radius:8px;padding:11px 14px;display:flex;align-items:flex-start;gap:10px}
+.pr-card.top{border-left:3px solid #002D72}
+.pr-rank{font-size:20px;font-weight:700;color:#e5e7eb;min-width:26px}
+.pr-info{flex:1}
+.pr-name{font-size:13px;font-weight:600;color:#111;margin-bottom:2px}
+.pr-dept{font-size:11px;color:#6b7280;margin-bottom:5px}
+.pr-tags{display:flex;gap:4px;flex-wrap:wrap}
+.pr-score{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.pr-score-n{font-size:16px;font-weight:700;color:#002D72}
+.pr-score-l{font-size:9px;color:#9ca3af}
+/* Matrix */
+.matrix-wrap{padding:20px 24px;overflow:auto}
+.matrix-controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.matrix-controls select{padding:6px 10px;border:1px solid #e2e5ea;border-radius:6px;font-size:12px;color:#374151;background:white}
+.matrix-controls h2{font-size:15px;font-weight:600;color:#111;margin-right:auto}
+.legend{display:flex;gap:14px;margin-bottom:12px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#6b7280}
+.dot-h{width:14px;height:14px;border-radius:50%;background:#002D72;display:inline-block}
+.dot-m{width:14px;height:14px;border-radius:50%;background:#93c5fd;display:inline-block}
+.dot-l{width:12px;height:12px;border-radius:50%;background:#e5e7eb;border:1px solid #d1d5db;display:inline-block}
+table.mtx{border-collapse:collapse;font-size:11px;white-space:nowrap}
+table.mtx th{padding:7px 9px;text-align:left;font-weight:600;color:#6b7280;font-size:9px;text-transform:uppercase;letter-spacing:.05em;background:#f8f9fb;border:1px solid #e2e5ea}
+table.mtx td{padding:5px 9px;border:1px solid #e2e5ea;vertical-align:middle;text-align:center}
+table.mtx tr:hover td{background:#f8f9ff}
+.m-name-cell{text-align:left!important}
+.m-name{font-weight:600;color:#111;font-size:12px}
+.m-cat{font-size:9px;color:#9ca3af}
+.mdot{width:16px;height:16px;border-radius:50%;display:inline-block;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo-area">
+    <div class="logo-mark">RE</div>
+    <div class="logo-text">Foundation Alignment Tool <small>Ralph O'Connor Sustainable Energy Institute · Johns Hopkins University</small></div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('rf')">Researcher → Foundations</button>
+    <button class="nav-tab" onclick="switchView('fr')">Foundation → Researchers</button>
+    <button class="nav-tab" onclick="switchView('matrix')">Alignment matrix</button>
+  </div>
+  <div class="status"><span class="dot-live"></span>83 researchers · 12 foundations</div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-n">83</div><div class="stat-l">Researchers</div></div>
+  <div class="divider"></div>
+  <div class="stat"><div class="stat-n">21</div><div class="stat-l">Core Faculty</div></div>
+  <div class="divider"></div>
+  <div class="stat"><div class="stat-n">83</div><div class="stat-l">Narrative ready</div></div>
+  <div class="divider"></div>
+  <div class="stat"><div class="stat-n orange">0</div><div class="stat-l">Grants entered</div></div>
+  <div class="divider"></div>
+  <div class="stat"><div class="stat-n gray">0</div><div class="stat-l">Appetite rated</div></div>
+  <div class="stat-note">ⓘ Gray fields = internal data needed to activate full matching</div>
+</div>
+
+<!-- VIEW 1: Researcher → Foundations -->
+<div id="view-rf" class="view active">
+  <div class="two-col">
+    <div class="left-panel">
+      <div class="panel-header">
+        <div class="panel-label">Select a researcher</div>
+        <input class="search-input" type="text" placeholder="Search by name or department…" oninput="filterR(this.value)" id="rsearch">
+        <div class="filter-row" id="cat-filters">
+          <button class="chip on" onclick="setCat('All',this)">All</button>
+          <button class="chip" onclick="setCat('Core',this)">Core</button>
+          <button class="chip" onclick="setCat('Associate',this)">Associate</button>
+          <button class="chip" onclick="setCat('Affiliate',this)">Affiliate</button>
+        </div>
+      </div>
+      <div class="r-list" id="r-list"></div>
+    </div>
+    <div class="right-panel" id="rf-detail">
+      <div class="empty-state" style="height:100%">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <p>Select a researcher to see foundation matches</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW 2: Foundation → Researchers -->
+<div id="view-fr" class="view">
+  <div class="two-col">
+    <div class="left-panel">
+      <div class="panel-header">
+        <div class="panel-label">Select a foundation</div>
+      </div>
+      <div class="r-list" id="f-list"></div>
+    </div>
+    <div class="right-panel" id="fr-detail">
+      <div class="empty-state" style="height:100%">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <p>Select a foundation to see matched researchers</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW 3: Matrix -->
+<div id="view-matrix" class="view">
+  <div class="matrix-wrap">
+    <div class="matrix-controls">
+      <h2>Alignment matrix — Core &amp; Associate Faculty × Foundations</h2>
+      <select id="m-toc" onchange="renderMatrix()">
+        <option value="">All theories of change</option>
+        <option>Technology</option><option>Policy</option><option>Market</option><option>Justice</option><option>Modeling</option>
+      </select>
+      <select id="m-pillar" onchange="renderMatrix()">
+        <option value="">All pillars</option>
+        <option>Carbon</option><option>Storage</option><option>Wind</option><option>Grid</option><option>Nuclear</option><option>Solar</option>
+      </select>
+    </div>
+    <div class="legend">
+      <div class="leg-item"><span class="dot-h"></span> Strong match (60%+)</div>
+      <div class="leg-item"><span class="dot-m"></span> Partial match (35–59%)</div>
+      <div class="leg-item"><span class="dot-l"></span> Weak (&lt;35%)</div>
+    </div>
+    <div id="matrix-container"></div>
+  </div>
+</div>
+
+<script>
+const RESEARCHERS = [{"name": "Jan Drgona", "category": "Core", "title": "Associate Professor \u00b7 Civil and Systems Engineering", "dept": "Civil and Systems Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["AI in Energy", "Optimization"], "toc": ["Technology", "Modeling"], "policy": "Data center efficiency mandates, AI-driven energy consumption regulations, and grid modernization standards.", "wg": ["Data Centers"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Yury Dvorkin", "category": "Core", "title": "Associate Professor \u00b7 Departments of Civil and Systems Engineering and Electrical and Computer Engineering", "dept": "Civil and Systems Engineering and Electrical and Computer Engineering", "school": "Whiting School of Engineering", "leadership": true, "pillarLead": "Grid", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear"], "tech": ["AI in Energy", "Optimization"], "toc": ["Technology", "Justice"], "policy": "Grid modernization equity standards, state-level energy justice mandates, power systems reliability regulations for renewable-heavy grids.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Jonah Erlebacher", "category": "Core", "title": "Professor \u00b7 Materials Science and Engineering", "dept": "Materials Science and Engineering", "school": "Whiting School of Engineering", "leadership": true, "pillarLead": "Carbon", "pillars": ["Carbon", "Storage", "Wind", "Grid"], "tech": ["Catalysis"], "toc": ["Technology"], "policy": "Carbon capture materials standards, electrochemical manufacturing incentives, and critical materials supply chain policy.", "wg": ["Energy Justice", "State Action"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Regina Garcia-Mendez", "category": "Core", "title": "Assistant Professor \u00b7 Materials Science and Engineering", "dept": "Materials Science and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear"], "tech": ["Catalysis", "AI in Energy", "Optimization"], "toc": ["Technology"], "policy": "EV battery supply chain security, grid-scale storage manufacturing incentives, and clean fuel standards.", "wg": ["Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Dennice F. Gayme", "category": "Core", "title": "Professor \u00b7 Mechanical Engineering", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": true, "pillarLead": "Wind", "pillars": ["Storage", "Wind", "Grid"], "tech": ["AI in Energy", "Optimization"], "toc": ["Technology", "Modeling"], "policy": "Offshore wind array performance standards, grid control automation regulations, and AI-enabled grid optimization policy.", "wg": ["Energy Justice", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Sijia Geng", "category": "Core", "title": "Assistant Professor \u00b7 Electrical and Computer Engineering", "dept": "Electrical and Computer Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling", "Technology"], "policy": "Federal grid reliability and resilience standards, EV charging infrastructure integration policies.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Ive Hermans", "category": "Core", "title": "Bloomberg Distinguished Professor of Sustainable Chemical Transformations", "dept": "Chemical and Biomolecular Engineering; Chemistry", "school": "Whiting School of Engineering / Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology", "Market"], "policy": "Industrial decarbonization frameworks, chemical manufacturing emissions standards, and circular economy supply chains.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Benjamin F. Hobbs", "category": "Core", "title": "Theodore M. and Kay W. Schad Professor of Environmental Management Environmental Health and Engineering", "dept": "Environmental Health and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "Grid", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["Catalysis", "AI in Energy", "Optimization"], "toc": ["Policy", "Modeling"], "policy": "FERC electricity market design, state-level carbon pricing frameworks, and grid decarbonization planning mandates.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Daniel Kammen", "category": "Core", "title": "Bloomberg Distinguished Professor of the Just Energy Transition \u00b7 Civil and Systems Engineering \u00b7 School of Advanced International Studies", "dept": "Civil and Systems Engineering; School of Advanced International Studies", "school": "Whiting School of Engineering / School of Advanced International Studies (SAIS)", "leadership": true, "pillarLead": "", "pillars": ["Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["AI in Energy", "Optimization"], "toc": ["Justice", "Policy"], "policy": "Energy equity and environmental justice mandates, international climate finance, rural electrification policy, and the geopolitical implications of clean energy grids.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Magdalena Klemun", "category": "Core", "title": "Assistant Professor \u00b7 Civil and Systems Engineering", "dept": "Civil and Systems Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["AI in Energy", "Optimization"], "toc": ["Policy", "Market"], "policy": "Net-zero infrastructure financing, clean energy cost-reduction pathways, and technology deployment policy.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Branko Kosovi\u0107", "category": "Core", "title": "Associate Research Scientist \u00b7 Ralph O'Connor Sustainable Energy Institute", "dept": "Ralph O'Connor Sustainable Energy Institute", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Wind", "Grid", "Solar"], "tech": ["AI in Energy", "Optimization"], "toc": ["Modeling", "Technology"], "policy": "Wind energy siting and forecasting standards, grid integration rules for variable renewables, and AI-driven weather prediction for energy systems.", "wg": ["Energy Justice", "Transmission"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Julie K. Lundquist", "category": "Core", "title": "Bloomberg Distinguished Professor of Atmospheric Science and Wind Energy \u00b7 Departments of Earth & Planetary Sciences and Mechanical Engineering", "dept": "Earth and Planetary Sciences; Mechanical Engineering", "school": "Whiting School of Engineering / Krieger School of Arts and Sciences", "leadership": true, "pillarLead": "Wind", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["AI in Energy", "Optimization"], "toc": ["Technology", "Modeling"], "policy": "Federal offshore wind siting and permitting standards, wind farm efficiency regulations, and atmospheric science standards for energy forecasting.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Yuting Luo", "category": "Core", "title": "Assistant Professor \u00b7 Materials Science and Engineering", "dept": "Materials Science and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Nuclear", "Solar"], "tech": ["Catalysis", "AI in Energy", "Optimization"], "toc": ["Technology"], "policy": "Cleantech R&D tax incentives, domestic critical materials processing standards.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Jeffrey Maranchi", "category": "Core", "title": "Research Program Area Manager", "dept": "Applied Physics Laboratory", "school": "Applied Physics Laboratory", "leadership": true, "pillarLead": "Storage", "pillars": ["Storage"], "tech": [], "toc": ["Technology"], "policy": "Battery energy density and safety standards, domestic grid-scale storage manufacturing policy, and DOD energy storage requirements.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Grace Panetti", "category": "Core", "title": "Assistant Professor \u00b7 Chemistry", "dept": "Chemistry", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Nuclear", "Solar"], "tech": ["Catalysis"], "toc": ["Technology"], "policy": "Industrial point-source emission reduction targets and green chemical manufacturing mandates.", "wg": ["State Action"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Benjamin W. Schafer", "category": "Core", "title": "Willard and Lillian Hackerman Professor of Civil and Systems Engineering", "dept": "Civil and Systems Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["Catalysis", "AI in Energy", "Optimization"], "toc": ["Technology"], "policy": "Low-carbon structural steel standards, resilient building codes for climate adaptation, and offshore wind foundation engineering regulations.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Abe Silverman", "category": "Core", "title": "Assistant Research Scholar \u00b7 Ralph O'Connor Sustainable Energy Institute", "dept": "Ralph O'Connor Sustainable Energy Institute", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["AI in Energy"], "toc": ["Policy"], "policy": "State-level energy policy translation, regulatory frameworks for grid modernization, and policy pathways for just energy transitions.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Mitra Taheri", "category": "Core", "title": "Professor \u00b7 Materials Science and Engineering", "dept": "Materials Science and Engineering", "school": "Whiting School of Engineering", "leadership": true, "pillarLead": "Nuclear", "pillars": ["Nuclear"], "tech": [], "toc": ["Technology", "Modeling"], "policy": "Nuclear energy safety regulations, long-term grid component life extension policies, and green steel infrastructure standards.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Sara Thoi", "category": "Core", "title": "Associate Professor \u00b7 Chemistry", "dept": "Chemistry", "school": "Krieger School of Arts and Sciences", "leadership": true, "pillarLead": "Storage", "pillars": ["Carbon", "Storage", "Nuclear", "Solar"], "tech": ["Catalysis", "AI in Energy"], "toc": ["Technology"], "policy": "Electrochemical storage safety standards, critical materials sourcing for batteries, and electrocatalysis manufacturing incentives.", "wg": ["Energy Justice", "State Action", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Susanna Thon", "category": "Core", "title": "Associate Professor and the Marshal Salant Faculty Scholar \u00b7 Electrical and Computer Engineering", "dept": "Electrical and Computer Engineering", "school": "Whiting School of Engineering", "leadership": true, "pillarLead": "Storage, Nuclear, Solar", "pillars": ["Carbon", "Storage", "Nuclear", "Solar"], "tech": ["Catalysis", "AI in Energy", "Optimization"], "toc": ["Technology"], "policy": "Next-generation solar manufacturing tax incentives, optical materials R&D policy, and clean energy minor/workforce development standards.", "wg": ["State Action", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Chao Wang", "category": "Core", "title": "Associate Professor \u00b7 Chemical and Biomolecular Engineering", "dept": "Chemical and Biomolecular Engineering", "school": "Whiting School of Engineering", "leadership": true, "pillarLead": "Carbon", "pillars": ["Carbon"], "tech": [], "toc": ["Technology"], "policy": "Carbon capture catalysis standards, electrochemical CO2 conversion incentives, and sustainable chemical manufacturing policy.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Bentley Allan", "category": "Associate", "title": "Associate Professor \u00b7 Political Science", "dept": "Political Science", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Policy", "Market"], "policy": "Net-zero industrial strategy, U.S. and allied critical mineral supply security, trade-climate intersections, and regional economic transitions.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Brandon C. Bukowksi", "category": "Associate", "title": "Assistant Professor \u00b7 Chemical and Biomolecular Engineering", "dept": "Chemical and Biomolecular Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage"], "tech": ["Catalysis", "AI in Energy"], "toc": ["Technology", "Modeling"], "policy": "Clean manufacturing guidelines and industrial decarbonization incentives.", "wg": ["Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Paulette Clancy", "category": "Associate", "title": "Edward J. Schaefer Professor in Engineering \u00b7 Chemical and Biomolecular Engineering", "dept": "Chemical and Biomolecular Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Grid", "Nuclear", "Solar"], "tech": ["Catalysis", "AI in Energy", "Optimization"], "toc": ["Technology", "Modeling"], "policy": "Computational materials design standards, AI-accelerated cleantech R&D policy, and critical materials manufacturing incentives.", "wg": ["Energy Justice", "State Action", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Konstantinos Gerasopoulos", "category": "Associate", "title": "Program Manager and Principal Staff Scientist \u00b7 Applied Physics Laboratory", "dept": "Applied Physics Laboratory", "school": "Applied Physics Laboratory", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Next-generation battery manufacturing standards and domestic storage supply chain resilience.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "James Guest", "category": "Associate", "title": "Department Head and Professor \u00b7 Civil and Systems Engineering", "dept": "Civil and Systems Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology", "Modeling"], "policy": "Federal infrastructure manufacturing standards, material efficiency mandates, and civil engineering building codes for extreme weather resilience.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Howard Katz", "category": "Associate", "title": "Professor \u00b7 Materials Science and Engineering", "dept": "Materials Science and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Solar"], "tech": ["Catalysis"], "toc": ["Technology"], "policy": "Advanced materials R&D standards and thermoelectric manufacturing incentives.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Rebekka Klausen", "category": "Associate", "title": "Professor \u00b7 Chemistry", "dept": "Chemistry", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Solar"], "tech": [], "toc": ["Technology"], "policy": "Domestic cleantech manufacturing standards and chemical safety frameworks for optoelectronics.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "S.M. Koohpayeh", "category": "Associate", "title": "Associate Research Professor \u00b7 Departments of Physics & Materials Science and Engineering", "dept": "Physics & Materials Science and Engineering", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Solar"], "tech": [], "toc": ["Technology"], "policy": "Critical materials processing frameworks and infrastructure durability standards.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Umesh Korde", "category": "Associate", "title": "Research Professor \u00b7 Environmental Health and Engineering", "dept": "Environmental Health and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["AI in Energy", "Optimization"], "toc": ["Technology", "Modeling"], "policy": "Marine renewable energy permitting, coastal resiliency frameworks, and offshore grid integration.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Michael Levien", "category": "Associate", "title": "Associate Professor \u00b7 Sociology", "dept": "Sociology", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind"], "tech": [], "toc": ["Justice"], "policy": "Environmental justice mandates, community benefit agreements (CBAs), and fair land-acquisition policies for renewable arrays.", "wg": ["Energy Justice", "State Action"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Yayuan Liu", "category": "Associate", "title": "Russell Croft Faculty Scholar and Assistant Professor \u00b7 Chemical and Biomolecular Engineering", "dept": "Chemical and Biomolecular Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["Catalysis", "AI in Energy"], "toc": ["Technology"], "policy": "Electrochemical carbon conversion standards, grid-scale storage materials policy, and critical mineral supply chain regulations.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Enrique Mallada", "category": "Associate", "title": "Associate Professor \u00b7 Electrical and Computer Engineering", "dept": "Electrical and Computer Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "Grid", "pillars": ["Grid"], "tech": ["AI in Energy"], "toc": ["Modeling", "Technology"], "policy": "FERC market-clearing rules and regional transmission organization (RTO) grid reliability mandates.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Mahdi Mehrtash", "category": "Associate", "title": "Assistant Research Professor \u00b7 Ralph O'Connor Sustainable Energy Institute", "dept": "Environmental Health and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["Catalysis", "AI in Energy", "Optimization"], "toc": ["Modeling", "Market"], "policy": "Grid modernization funding frameworks, state-level virtual power plant (VPP) policy, and EV charging network rules.", "wg": ["Energy Justice", "State Action", "Transmission", "Data Centers", "Translation"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Charles Meneveau", "category": "Associate", "title": "Louis M. Sardella Professor \u00b7 Mechanical Engineering", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "Wind", "pillars": ["Wind", "Grid", "Solar"], "tech": [], "toc": ["Modeling"], "policy": "Bureau of Ocean Energy Management (BOEM) spatial leasing standards and federal wind array efficiency targets.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Jonas Nahm", "category": "Associate", "title": "Associate Professor of Energy \u00b7 Resources \u00b7 and Environment", "dept": "Energy, Resources, and Environment", "school": "School of Advanced International Studies (SAIS)", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Market", "Policy"], "policy": "Inflation Reduction Act (IRA) implementation, global clean tech trade disputes, and state-led capacity for greening the automotive and manufacturing sectors.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Corey Oses", "category": "Associate", "title": "Assistant Professor \u00b7 Materials Science and Engineering", "dept": "Materials Science and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["Catalysis", "AI in Energy", "Optimization"], "toc": ["Technology", "Modeling"], "policy": "Critical materials discovery, high-throughput materials informatics standards, and AI-accelerated clean energy materials R&D policy.", "wg": ["Data Centers"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Rachel Sangree", "category": "Associate", "title": "Associate Teaching Professor \u00b7 Civil and Systems Engineering", "dept": "Civil and Systems Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Low-carbon concrete adoption and resilient structural engineering building codes.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Michael Shields", "category": "Associate", "title": "Professor \u00b7 Civil and Systems Engineering", "dept": "Civil and Systems Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": ["AI in Energy"], "toc": ["Modeling"], "policy": "Structural safety margins for renewable infrastructure and algorithmic standards for structural risk modeling.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Shilva Shrestha", "category": "Associate", "title": "Assistant Professor \u00b7 Environmental Health and Engineering", "dept": "Environmental Health and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Nuclear", "Solar"], "tech": ["AI in Energy"], "toc": ["Technology", "Justice"], "policy": "Biofuel blending mandates, municipal organic waste diversion laws, and low-carbon fuel standards (LCFS).", "wg": ["State Action", "Data Centers"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Michael Tsapatsis", "category": "Associate", "title": "Bloomberg Distinguished Professor of Nanomaterials \u00b7 Departments of Chemical and Biomolecular Engineering and Research and Exploratory Development", "dept": "Chemical and Biomolecular Engineering", "school": "Whiting School of Engineering / Applied Physics Laboratory", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Corporate decarbonization tax credits, industrial efficiency mandates, and carbon capture deployment regulation.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Johannes Urpelainen", "category": "Associate", "title": "Director and Prince Sultan bin Abdulaziz Professor of Energy \u00b7 Resources and Environment \u00b7 Director of the Initiative for Sustainable Energy Policy", "dept": "Energy, Resources, and Environment", "school": "School of Advanced International Studies (SAIS)", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Justice", "Policy"], "policy": "International climate finance, energy access metrics for the global poor, and local governance frameworks for micro-grids.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Benjamin Zaitchik", "category": "Associate", "title": "Morton K. Blaustein Chair and Professor \u00b7 Earth and Planetary Sciences", "dept": "Earth and Planetary Sciences", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": ["Carbon", "Storage", "Wind", "Grid", "Solar"], "tech": ["AI in Energy", "Optimization"], "toc": ["Modeling", "Justice"], "policy": "Urban heat mitigation mandates, climate adaptation funding distribution, and agricultural water use rules.", "wg": ["Energy Justice", "State Action"], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Yair Amir", "category": "Affiliate", "title": "Associate Research Scientist", "dept": "Computer Science", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "NERC CIP cybersecurity standards for power grids and federal critical infrastructure protection mandates.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Dhananjay Anand", "category": "Affiliate", "title": "Associate Research Scientist", "dept": "Electrical and Computer Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Hardware-level energy efficiency standards and grid-tied device data protocols.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Amitabh Basu", "category": "Affiliate", "title": "Professor", "dept": "Applied Mathematics and Statistics", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Regional electricity market design and algorithmic transparency standards for power distribution.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Michael Betenbaugh", "category": "Affiliate", "title": "Professor", "dept": "Chemical and Biomolecular Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Federal bioeconomy growth strategies and sustainable biochemical regulatory frameworks.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Art Bragg", "category": "Affiliate", "title": "Associate Professor", "dept": "Chemistry", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Solar material safety regulations and clean energy R&D tax incentives.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Lucas Buccafusca", "category": "Affiliate", "title": "Lecturer", "dept": "Electrical and Computer Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Local micro-grid deployment policy and net metering standardization.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Jonathan Elliott", "category": "Affiliate", "title": "Assistant Professor", "dept": "Economics", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Market", "Policy"], "policy": "Carbon pricing frameworks, clean energy tax credit design under the IRA, and anti-trust rules in utility markets.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Ali Fattahi", "category": "Affiliate", "title": "Assistant Professor", "dept": "Operations Management & Business Analytics", "school": "Carey Business School", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Market"], "policy": "Extended producer responsibility (EPR) regulations and corporate Scope 3 emission disclosures.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Paul Ferraro", "category": "Affiliate", "title": "Bloomberg Distinguished Professor of Human Behavior and Public Policy \u00b7 Environmental Health and Engineering and the Carey Business School", "dept": "Environmental Health and Engineering", "school": "Whiting School of Engineering / Carey Business School", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Policy", "Market"], "policy": "Behavioral design in utility energy efficiency programs and evidence-based environmental policy evaluation metrics.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Amy Foster", "category": "Affiliate", "title": "Associate Professor", "dept": "Electrical and Computer Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Data center efficiency mandates and green information-infrastructure guidelines.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Helyette Geman", "category": "Affiliate", "title": "Research Professor", "dept": "Applied Mathematics and Statistics", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Market"], "policy": "Carbon offset market transparency rules and CFTC commodity trading regulations for green energy storage assets.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Thomas Gernay", "category": "Affiliate", "title": "Associate Professor \u00b7 Civil and Systems Engineering", "dept": "Civil and Systems Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology", "Modeling"], "policy": "International Building Code (IBC) updates for battery storage safety and structural fire resilience mandates.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Somnath Ghosh", "category": "Affiliate", "title": "Michael G. Callas Chair Professor", "dept": "Civil and Systems Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Infrastructure structural material certification and clean hydrogen transport regulations.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "David Goldberg", "category": "Affiliate", "title": "Professor", "dept": "Chemistry", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Advanced chemical manufacturing emissions limits and sustainable synthesis standards.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Somdatta Goswami", "category": "Affiliate", "title": "Assistant Professor", "dept": "Civil and Systems Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Automated safety-monitoring standards for state-level energy infrastructure and pipeline networks.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Rigoberto Hernandez", "category": "Affiliate", "title": "Gompf Family Professor of Chemistry", "dept": "Chemistry", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Nanomaterial manufacturing safety rules and federal computational chemistry R&D grants.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Marisa Hughes", "category": "Affiliate", "title": "Assistant Program Manager", "dept": "Applied Physics Laboratory", "school": "Applied Physics Laboratory", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling", "Policy"], "policy": "Methane fee enforcement guidelines under the Clean Air Act and municipal climate vulnerability funding models.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Ryan Hurley", "category": "Affiliate", "title": "Associate Professor", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Geothermal energy permitting rules and deep-subsurface environmental protection guidelines.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Sung Hoon Kang", "category": "Affiliate", "title": "Associate Professor", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Resource-conservation building mandates and structural lifecycle extension protocols.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Saman Karimi", "category": "Affiliate", "title": "Assistant Research Scientist", "dept": "Earth and Planetary Sciences", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Subsurface carbon injection safety standards and federal geothermal site leasing regulations.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Joseph Katz", "category": "Affiliate", "title": "William F. Ward Sr. Distinguished Professor", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling", "Technology"], "policy": "Hydrokinetic energy installation safety codes and federal marine engineering targets.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Thomas Kempa", "category": "Affiliate", "title": "Associate Professor", "dept": "Chemistry", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Domestic solar manufacturing supply mandates and critical mineral processing incentives.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Jesse Ko", "category": "Affiliate", "title": "Senior Staff Scientist", "dept": "Applied Physics Laboratory", "school": "Applied Physics Laboratory", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology", "Market"], "policy": "Battery recycling mandates, e-waste handling laws, and critical mineral sourcing requirements under the IRA.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Nicolas Loizou", "category": "Affiliate", "title": "Assistant Professor", "dept": "Applied Mathematics and Statistics", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "EV fast-charging data interoperability rules and decentralized energy accounting standards.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Bruce Marsh", "category": "Affiliate", "title": "Professor Emeritus and Academy Professor", "dept": "Earth and Planetary Sciences", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Deep geothermal extraction liability frameworks and public land access guidelines.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Tyrel McQueen", "category": "Affiliate", "title": "Professor", "dept": "Chemistry and Physics", "school": "Krieger School of Arts and Sciences", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Superconducting transmission line grid investments and high-tech manufacturing R&D credits.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Scot Miller", "category": "Affiliate", "title": "Assistant Professor", "dept": "Environmental Health and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling", "Policy"], "policy": "Independent greenhouse gas verification protocols, EPA emission inventory enforcement, and global carbon accounting rules.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Rajat Mittal", "category": "Affiliate", "title": "Professor", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Urban wind turbine zoning guidelines and acoustic noise pollution limits for renewable energy infrastructure.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Rui Ni", "category": "Affiliate", "title": "Associate Professor", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling", "Technology"], "policy": "Industrial point-source carbon capture efficiency metrics and manufacturing air-quality standards.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Ruggero Rossi", "category": "Affiliate", "title": "Associate Professor", "dept": "Environmental Health and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology", "Justice"], "policy": "Clean Water Act compliance incentives and distributed municipal water-energy integration funds.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Timothy Rupert", "category": "Affiliate", "title": "", "dept": "", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "Nuclear", "pillars": ["Nuclear"], "tech": [], "toc": ["Technology"], "policy": "Small modular reactor (SMR) material certification rules and hydrogen transportation pipeline safety codes.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Fadil Santosa", "category": "Affiliate", "title": "Professor and Head", "dept": "Applied Mathematics and Statistics", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Computational design verification standards for public infrastructure engineering.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Anita Vernekar Shankar", "category": "Affiliate", "title": "Associate Scientist", "dept": "International Health", "school": "Bloomberg School of Public Health", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Justice", "Policy"], "policy": "International clean cooking initiatives, global health development funding metrics, and gender-equity targets in energy aid.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "James Spicer", "category": "Affiliate", "title": "Professor", "dept": "Materials Science and Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Next-generation photovoltaic manufacturing tax incentives and solar cell waste management guidelines.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Leann Thayaparan", "category": "Affiliate", "title": "Assistant Professor of Operations Management & Business Analytics", "dept": "Carey Business School", "school": "Carey Business School", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Market", "Modeling"], "policy": "Hospital energy-resilience regulations and disaster relief supply chain energy metrics.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Gretar Tryggvason", "category": "Affiliate", "title": "Charles A. Miller Jr. Distinguished Professor and Department Head", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "High-performance computing resource allocations and heavy-industry efficiency codes.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "James West", "category": "Affiliate", "title": "Professor", "dept": "Electrical and Computer Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Technology"], "policy": "Real-time infrastructure safety monitoring rules and patent protections for green technology innovations.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Peter Winch", "category": "Affiliate", "title": "Professor", "dept": "International Health", "school": "Bloomberg School of Public Health", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Justice", "Policy"], "policy": "USAID climate adaptation guidelines, international public health-climate coordination rules, and urban heat health strategies.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Tamer Zaki", "category": "Affiliate", "title": "Professor", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling"], "policy": "Maritime shipping emission limits, international transportation fuel standards, and wind array wake management guidelines.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}, {"name": "Feng Zhu", "category": "Affiliate", "title": "Associate Research Professor", "dept": "Mechanical Engineering", "school": "Whiting School of Engineering", "leadership": false, "pillarLead": "", "pillars": [], "tech": [], "toc": ["Modeling", "Technology"], "policy": "Wave and tidal energy array installation criteria and regional hydrodynamic leasing rules.", "wg": [], "engagementAppetite": "", "priorityScore": 0, "grants": "", "fundStacking": ""}];
+
+const FOUNDATIONS = [
+  {name:"Bloomberg Philanthropies",tier:1,range:"$500K–$5M",toc:["Policy","Justice","Modeling"],pillars:["Grid","Solar","Wind"],why:"Deep alignment with justice-framed grid and solar work; funds policy translation and public engagement layers on technical research."},
+  {name:"Heising-Simons Foundation",tier:1,range:"$200K–$2M",toc:["Technology","Modeling"],pillars:["Carbon","Storage","Solar"],why:"Strong match for deep-tech researchers in carbon capture, storage, and solar with clear translational pathways."},
+  {name:"Grantham Foundation",tier:1,range:"$250K–$3M",toc:["Policy","Modeling","Technology"],pillars:["Carbon","Grid","Wind"],why:"Prioritizes grid decarbonization modeling and carbon-focused technology work with strong policy angles."},
+  {name:"Sequoia Climate Foundation",tier:1,range:"$500K–$10M",toc:["Technology","Market","Policy"],pillars:["Storage","Grid","Carbon"],why:"Funds large-scale technology commercialization — best for researchers with active federal grants and clear market transition stories."},
+  {name:"Bezos Earth Fund",tier:1,range:"$1M–$20M",toc:["Technology","Justice","Policy"],pillars:["Carbon","Storage","Grid","Solar","Wind"],why:"Broad pillar coverage with preference for researchers who bridge technology and systemic change."},
+  {name:"MacArthur Foundation",tier:2,range:"$100K–$1M",toc:["Policy","Justice","Market"],pillars:["Grid","Wind","Solar"],why:"Strong policy-translation focus; funds research on grid justice, community benefit, and clean energy equity."},
+  {name:"Rockefeller Foundation",tier:2,range:"$200K–$2M",toc:["Justice","Policy"],pillars:["Solar","Grid","Storage"],why:"Best fit for global-facing researchers — particularly SAIS faculty working on international energy access and climate finance."},
+  {name:"Arnold Ventures",tier:2,range:"$150K–$2M",toc:["Policy","Modeling","Market"],pillars:["Grid","Carbon","Storage"],why:"Evidence-based policy research, regulatory innovation, and market design — strong fit for policy and modeling researchers."},
+  {name:"Breakthrough Energy",tier:2,range:"$500K–$5M",toc:["Technology","Market"],pillars:["Storage","Carbon","Nuclear","Solar"],why:"Early-stage commercialization of clean energy technologies; best for deep-tech researchers with near-term translation potential."},
+  {name:"Packard Foundation",tier:2,range:"$150K–$1.5M",toc:["Technology","Modeling"],pillars:["Carbon","Wind","Solar"],why:"Strong affinity for atmospheric science, ocean-adjacent energy, and climate modeling work."},
+  {name:"Skyline Foundation",tier:3,range:"$50K–$500K",toc:["Policy","Market"],pillars:["Grid","Solar"],why:"Thin profile; state-level policy focus. Monitor for next grant cycle announcement."},
+  {name:"Blue Horizons Foundation",tier:3,range:"$75K–$750K",toc:["Technology","Modeling"],pillars:["Wind","Storage"],why:"Emerging funder with offshore wind and battery focus. Watch for RFP."}
+];
+
+let selR = null, selF = null, catFilter = 'All';
+const uniq = (arr,key) => arr.filter((v,i,a)=>a.findIndex(x=>x[key]===v[key])===i);
+const allR = uniq(RESEARCHERS,'name');
+
+function initials(n){return n.split(' ').filter(w=>w.length>1).map(w=>w[0]).slice(0,2).join('').toUpperCase()}
+
+function score(r,f){
+  let s=0;
+  s += r.pillars.filter(p=>f.pillars.includes(p)).length * 20;
+  s += r.toc.filter(t=>f.toc.some(ft=>ft.includes(t)||t.includes(ft))).length * 25;
+  if(r.leadership) s+=10;
+  if(r.category==='Core') s+=8;
+  const pw=(r.policy||'').toLowerCase().split(/\W+/);
+  const fw=(f.why+' '+f.toc.join(' ')).toLowerCase().split(/\W+/);
+  s += pw.filter(w=>w.length>4&&fw.includes(w)).length*6;
+  return Math.min(99,s);
+}
+
+function renderRList(){
+  const q=(document.getElementById('rsearch')||{value:''}).value.toLowerCase();
+  const el=document.getElementById('r-list'); if(!el)return;
+  const items=allR.filter(r=>{
+    if(catFilter!=='All'&&r.category!==catFilter)return false;
+    return !q||r.name.toLowerCase().includes(q)||(r.dept||'').toLowerCase().includes(q)||(r.school||'').toLowerCase().includes(q);
+  });
+  el.innerHTML=items.map(r=>`<div class="r-item${selR&&selR.name===r.name?' sel':''}" onclick="pickR('${r.name.replace(/'/g,"\\'")}')"><div class="r-name">${r.name}</div><div class="r-meta"><span class="badge b-${r.category}">${r.category}</span>${r.toc.slice(0,2).map(t=>`<span class="badge b-toc">${t}</span>`).join('')}</div></div>`).join('');
+}
+
+function pickR(name){selR=allR.find(r=>r.name===name);renderRList();renderRFDetail();}
+
+function renderRFDetail(){
+  const el=document.getElementById('rf-detail'); if(!el)return;
+  if(!selR){el.innerHTML=`<div class="empty-state" style="height:100%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg><p>Select a researcher to see foundation matches</p></div>`;return;}
+  const r=selR;
+  const matches=FOUNDATIONS.map(f=>({...f,s:score(r,f)})).sort((a,b)=>b.s-a.s);
+  const pillarsHtml=r.pillars.length?r.pillars.map(p=>`<span class="p-pill p${p}">${p}</span>`).join(''):`<span style="color:#9ca3af;font-size:11px;">Not yet mapped</span>`;
+  el.innerHTML=`<div class="detail">
+    <div class="gap-banner"><div class="gap-title">⚠ Internal data needed to activate full matching</div><ul class="gap-body"><li>Active Gov/Corporate Grants — powers fund stacking alerts</li><li>Foundation Engagement Appetite — determines outreach readiness</li></ul></div>
+    <div class="hero-card">
+      <div class="hero-top">
+        <div class="avatar">${initials(r.name)}</div>
+        <div><div class="hero-name">${r.name}${r.leadership?'<span class="lc-badge">Leadership Council</span>':''}</div><div class="hero-sub">${r.title}<br>${r.school}</div></div>
+      </div>
+      <div class="grid2">
+        <div><div class="field-label">Research pillars</div><div class="pill-row">${pillarsHtml}</div></div>
+        <div><div class="field-label">Theory of change</div><div class="pill-row">${r.toc.map(t=>`<span class="badge b-toc">${t}</span>`).join('')}</div></div>
+        <div><div class="field-label">Tech affinities</div><div class="pill-row">${r.tech.length?r.tech.map(t=>`<span class="badge b-toc">${t}</span>`).join(''):'<span style="color:#9ca3af;font-size:11px;">—</span>'}</div></div>
+        <div><div class="field-label">Foundation narrative</div><span class="ready">✓ Ready</span></div>
+        <div class="policy-text"><div class="field-label">Policy angle</div>${r.policy||'—'}</div>
+        <div><div class="field-label">Active grants <span class="needs">Needed</span></div><span style="color:#9ca3af;font-size:12px;">Not yet entered</span></div>
+        <div><div class="field-label">Engagement appetite <span class="needs">Needed</span></div><span style="color:#9ca3af;font-size:12px;">Not yet rated</span></div>
+      </div>
+    </div>
+    <div class="section-head">Foundation matches — ranked by alignment score</div>
+    <div class="f-cards">${matches.map((f,i)=>{
+      const pm=r.pillars.filter(p=>f.pillars.includes(p));
+      const tm=r.toc.filter(t=>f.toc.some(ft=>ft.includes(t)||t.includes(ft)));
+      return `<div class="f-card${i<3?' top':''}">
+        <div class="f-top-row">
+          <div><div class="f-name">${i<3?'<span class="star">★</span>':''}${f.name}</div><div class="f-sub">Tier ${f.tier} · ${f.range}</div></div>
+          <div class="score-wrap"><div class="score-bar"><div class="score-fill" style="width:${f.s}%"></div></div><div class="score-num">${f.s}%</div></div>
+        </div>
+        <div class="f-tags">${tm.map(t=>`<span class="tag-toc">${t} match</span>`).join('')}${pm.map(p=>`<span class="tag-pillar">${p}</span>`).join('')}<span class="tag-need">Fund stacking: needs grant data</span></div>
+        <div class="f-why">${f.why}</div>
+      </div>`;
+    }).join('')}</div>
+  </div>`;
+}
+
+function filterR(v){renderRList();}
+function setCat(cat,btn){
+  catFilter=cat;
+  document.querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderRList();
+}
+
+function renderFList(){
+  const el=document.getElementById('f-list'); if(!el)return;
+  el.innerHTML=FOUNDATIONS.map(f=>`<div class="f-list-item${selF&&selF.name===f.name?' sel':''}" onclick="pickF('${f.name.replace(/'/g,"\\'")}')"><div class="f-item-name">${f.name}</div><div class="f-item-meta"><span class="badge tier${f.tier}">Tier ${f.tier}</span><span style="font-size:10px;color:#9ca3af;">${f.range}</span>${f.toc.slice(0,2).map(t=>`<span class="badge b-toc">${t}</span>`).join('')}</div></div>`).join('');
+}
+
+function pickF(name){selF=FOUNDATIONS.find(f=>f.name===name);renderFList();renderFRDetail();}
+
+function renderFRDetail(){
+  const el=document.getElementById('fr-detail'); if(!el)return;
+  if(!selF){el.innerHTML=`<div class="empty-state" style="height:100%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg><p>Select a foundation to see matched researchers</p></div>`;return;}
+  const f=selF;
+  const matches=allR.map(r=>({...r,s:score(r,f)})).sort((a,b)=>b.s-a.s).slice(0,12);
+  el.innerHTML=`<div class="detail">
+    <div class="hero-card">
+      <div class="hero-top">
+        <div class="avatar" style="background:#FF6900;font-size:13px;">${f.name.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
+        <div><div class="hero-name">${f.name}</div><div class="hero-sub">Tier ${f.tier} · ${f.range} · ${f.toc.join(' / ')}</div></div>
+      </div>
+      <div class="grid2">
+        <div><div class="field-label">Priority pillars</div><div class="pill-row">${f.pillars.map(p=>`<span class="p-pill p${p}">${p}</span>`).join('')}</div></div>
+        <div><div class="field-label">Theories of change funded</div><div class="pill-row">${f.toc.map(t=>`<span class="badge b-toc">${t}</span>`).join('')}</div></div>
+        <div class="policy-text"><div class="field-label">Why ROSEI</div>${f.why}</div>
+      </div>
+    </div>
+    <div class="section-head">Top researcher matches</div>
+    <div class="pr-cards">${matches.map((r,i)=>{
+      const pm=r.pillars.filter(p=>f.pillars.includes(p));
+      return `<div class="pr-card${i<3?' top':''}">
+        <div class="pr-rank">${i+1}</div>
+        <div class="pr-info">
+          <div class="pr-name">${r.name} <span class="badge b-${r.category}">${r.category}</span>${r.leadership?' <span class="badge" style="background:#dbeafe;color:#1e40af;">LC</span>':''}</div>
+          <div class="pr-dept">${r.dept} · ${r.school}</div>
+          <div class="pr-tags">${r.toc.slice(0,2).map(t=>`<span class="badge b-toc">${t}</span>`).join('')}${pm.slice(0,3).map(p=>`<span class="p-pill p${p}">${p}</span>`).join('')}</div>
+        </div>
+        <div class="pr-score"><div class="pr-score-n">${r.s}%</div><div class="pr-score-l">match</div></div>
+      </div>`;
+    }).join('')}</div>
+  </div>`;
+}
+
+function renderMatrix(){
+  const tF=document.getElementById('m-toc').value;
+  const pF=document.getElementById('m-pillar').value;
+  const rows=allR.filter(r=>r.category!=='Affiliate').filter(r=>{
+    if(tF&&!r.toc.some(t=>t.includes(tF)))return false;
+    if(pF&&!r.pillars.includes(pF))return false;
+    return true;
+  }).slice(0,24);
+  const cols=FOUNDATIONS.slice(0,10);
+  let h=`<table class="mtx"><thead><tr><th>Researcher</th>`;
+  cols.forEach(f=>{h+=`<th style="max-width:75px;font-size:8px;">${f.name.split(' ').slice(0,2).join('<br>')}</th>`;});
+  h+=`</tr></thead><tbody>`;
+  rows.forEach(r=>{
+    h+=`<tr><td class="m-name-cell"><div class="m-name">${r.name}</div><div class="m-cat">${r.category}</div></td>`;
+    cols.forEach(f=>{
+      const s=score(r,f);
+      let dot='';
+      if(s>=60) dot=`<span class="mdot" style="background:#002D72;" title="${r.name} × ${f.name}: ${s}%"></span>`;
+      else if(s>=35) dot=`<span class="mdot" style="background:#93c5fd;" title="${r.name} × ${f.name}: ${s}%"></span>`;
+      else if(s>=15) dot=`<span class="mdot" style="background:#e5e7eb;border:1px solid #d1d5db;" title="${r.name} × ${f.name}: ${s}%"></span>`;
+      h+=`<td>${dot}</td>`;
+    });
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table>`;
+  document.getElementById('matrix-container').innerHTML=h;
+}
+
+function switchView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  const tabs=document.querySelectorAll('.nav-tab');
+  if(v==='rf')tabs[0].classList.add('active');
+  if(v==='fr')tabs[1].classList.add('active');
+  if(v==='matrix'){tabs[2].classList.add('active');renderMatrix();}
+}
+
+renderRList();
+renderFList();
+pickR('Daniel Kammen');
+</script>
+</body>
+</html>
